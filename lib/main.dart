@@ -14,7 +14,7 @@ class EasyFinances extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'EasyFinances',
       theme: ThemeData(useMaterial3: true),
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
