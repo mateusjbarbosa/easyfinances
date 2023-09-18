@@ -1,63 +1,51 @@
+import 'package:easyfinances/components/transaction_item.dart';
+import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
 
-class Transaction {
-  final String id;
-  final String title;
-  final String type;
-  final double value;
-  final DateTime date;
-
-  Transaction({
-    required this.id,
-    required this.title,
-    required this.type,
-    required this.value,
-    required this.date,
-  });
-}
-
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final List<Transaction> transactions = [
+    Transaction(
+      id: "1",
+      title: "Conta de luz",
+      type: TransactionType.expense,
+      value: 100,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: "2",
+      title: "Salário",
+      type: TransactionType.income,
+      value: 1300,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: "3",
+      title: "Conta de água",
+      type: TransactionType.expense,
+      value: 100,
+      date: DateTime.now(),
+    )
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final transactions = [
-      Transaction(
-        id: "1",
-        title: "Conta de luz",
-        type: "expense",
-        value: 100,
-        date: DateTime.now(),
-      ),
-      Transaction(
-        id: "2",
-        title: "Conta de luz",
-        type: "expense",
-        value: 100,
-        date: DateTime.now(),
-      ),
-      Transaction(
-        id: "3",
-        title: "Conta de luz",
-        type: "expense",
-        value: 100,
-        date: DateTime.now(),
-      )
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text("EasyFinances"),
+        title: const Text(
+          "EasyFinances",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
-        child: ListView.separated(
+        child: ListView.builder(
           itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text('item $index'),
-            );
+            return TransactionItem(transactions[index]);
           },
-          separatorBuilder: (ctx, index) => const Divider(),
           itemCount: transactions.length,
         ),
       ),
