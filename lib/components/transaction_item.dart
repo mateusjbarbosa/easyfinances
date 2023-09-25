@@ -1,5 +1,6 @@
 import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TransactionItem extends StatelessWidget {
   final Transaction transaction;
@@ -22,7 +23,7 @@ class TransactionItem extends StatelessWidget {
   }
 
   String getTransactionDate() {
-    return "${transaction.date.day}/${transaction.date.month}/${transaction.date.year} às ${transaction.date.hour}:${transaction.date.minute}";
+    return DateFormat('dd/MM/yyyy HH:mm').format(transaction.date).toString();
   }
 
   Widget getValueText() {
