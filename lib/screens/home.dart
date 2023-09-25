@@ -1,3 +1,4 @@
+import 'package:easyfinances/components/transaction_form.dart';
 import 'package:easyfinances/components/transaction_item.dart';
 import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
@@ -5,29 +6,16 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  final List<Transaction> transactions = [
-    Transaction(
-      id: "1",
-      title: "Conta de luz",
-      type: TransactionType.expense,
-      value: 100,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: "2",
-      title: "Salário",
-      type: TransactionType.income,
-      value: 1300,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: "3",
-      title: "Conta de água",
-      type: TransactionType.expense,
-      value: 100,
-      date: DateTime.now(),
-    )
-  ];
+  final List<Transaction> transactions = [];
+
+  Future<dynamic> handleAddNewTransaction(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return const TransactionForm();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +36,11 @@ class HomeScreen extends StatelessWidget {
           },
           itemCount: transactions.length,
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => handleAddNewTransaction(context),
+        backgroundColor: Colors.amber[900],
+        child: const Icon(Icons.add),
       ),
     );
   }
