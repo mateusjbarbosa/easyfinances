@@ -23,7 +23,7 @@ class TransactionItem extends StatelessWidget {
   }
 
   String getTransactionDate() {
-    return DateFormat('dd/MM/yyyy HH:mm').format(transaction.date).toString();
+    return DateFormat('dd/MM/yyyy').format(transaction.date);
   }
 
   Widget getValueText() {
