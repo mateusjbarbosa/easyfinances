@@ -1,7 +1,68 @@
+import 'package:easyfinances/components/button.dart';
+import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class TransactionForm extends StatelessWidget {
+class TransactionForm extends StatefulWidget {
   const TransactionForm({super.key});
+
+  @override
+  State<TransactionForm> createState() => _TransactionFormState();
+}
+
+class _TransactionFormState extends State<TransactionForm> {
+  late TextEditingController _descriptionController;
+  late TextEditingController _valueController;
+  TransactionType _transactionType = TransactionType.income;
+  DateTime _transactionDate = DateTime.now();
+
+  void _handleOpenCalendar() async {
+    DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _transactionDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light(),
+          child: child as Widget,
+        );
+      },
+    );
+
+    if (selectedDate == null) return;
+
+    setState(() {
+      _transactionDate = selectedDate;
+    });
+  }
+
+  void _handleSaveTransaction() {
+    print({
+      "description": _descriptionController.value.text,
+      "value": _valueController.value.text,
+      "type": _transactionType,
+      "date": _transactionDate,
+    });
+  }
+
+  void _handleCancelTransaction() {
+    Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    _descriptionController = TextEditingController();
+    _valueController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    _valueController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +73,7 @@ class TransactionForm extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const Text(
                 'Nova transação',
@@ -20,33 +82,104 @@ class TransactionForm extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
                   labelText: "Descrição",
                 ),
               ),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _valueController,
+                decoration: const InputDecoration(
                   labelText: "Valor",
                 ),
               ),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: "Tipo",
-                ),
+              Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: Text("Tipo"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _transactionType = TransactionType.income;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          _transactionType == TransactionType.income
+                              ? Colors.green
+                              : Colors.grey[500],
+                    ),
+                    child: const Text(
+                      "Entrada",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _transactionType = TransactionType.expense;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _transactionType == TransactionType.expense
+                                ? Colors.red
+                                : Colors.grey[500],
+                      ),
+                      child: const Text(
+                        "Saída",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
               ),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: "Data",
-                ),
+              Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: Text("Data"),
+                  ),
+                  Text(
+                    DateFormat("dd/MM/yyyy").format(_transactionDate),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: ElevatedButton(
+                      onPressed: _handleOpenCalendar,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[600],
+                      ),
+                      child: const Icon(
+                        Icons.calendar_month,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              ElevatedButton(
-                child: const Text('Salvar'),
-                onPressed: () {},
-              ),
-              ElevatedButton(
-                child: const Text('Cancelar'),
-                onPressed: () => Navigator.pop(context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Button(
+                    onPressed: _handleOpenCalendar,
+                    text: "Salvar",
+                    type: ButtonType.primary,
+                  ),
+                  const Spacer(),
+                  Button(
+                    onPressed: _handleCancelTransaction,
+                    text: "Cancelar",
+                    type: ButtonType.secondary,
+                  ),
+                ],
               ),
             ],
           ),
