@@ -169,7 +169,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Button(
-                    onPressed: _handleOpenCalendar,
+                    onPressed: _handleSaveTransaction,
                     text: "Salvar",
                     type: ButtonType.primary,
                   ),
