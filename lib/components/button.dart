@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 enum ButtonType { accent, primary, secondary }
 
 class Button extends StatelessWidget {
-  final Function onPressed;
+  final Function() onPressed;
   final String text;
   final ButtonType type;
 
@@ -42,7 +42,7 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => onPressed,
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(backgroundColor: getButtonColor()),
       child: Text(
         text,
