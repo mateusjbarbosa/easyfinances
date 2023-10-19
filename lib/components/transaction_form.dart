@@ -1,10 +1,16 @@
 import 'package:easyfinances/components/button.dart';
-import 'package:easyfinances/models/transaction.dart';
+import 'package:easyfinances/external/sqlite_database.dart';
+import 'package:easyfinances/models/transaction.dart' as transaction;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransactionForm extends StatefulWidget {
-  const TransactionForm({super.key});
+  final Function? callback;
+
+  const TransactionForm({
+    this.callback,
+    super.key,
+  });
 
   @override
   State<TransactionForm> createState() => _TransactionFormState();
@@ -13,7 +19,8 @@ class TransactionForm extends StatefulWidget {
 class _TransactionFormState extends State<TransactionForm> {
   late TextEditingController _descriptionController;
   late TextEditingController _valueController;
-  TransactionType _transactionType = TransactionType.income;
+  transaction.TransactionType _transactionType =
+      transaction.TransactionType.income;
   DateTime _transactionDate = DateTime.now();
 
   void _handleOpenCalendar() async {
@@ -37,13 +44,17 @@ class _TransactionFormState extends State<TransactionForm> {
     });
   }
 
-  void _handleSaveTransaction() {
-    print({
-      "description": _descriptionController.value.text,
-      "value": _valueController.value.text,
-      "type": _transactionType,
-      "date": _transactionDate,
-    });
+  void _handleSaveTransaction() async {
+    final newTransaction = transaction.Transaction(
+      description: _descriptionController.value.text,
+      type: _transactionType,
+      value: double.parse(_valueController.value.text),
+      date: _transactionDate,
+    );
+
+    await SQLDatabase.insert("transactions", newTransaction.toMap());
+
+    widget.callback!();
   }
 
   void _handleCancelTransaction() {
@@ -103,12 +114,12 @@ class _TransactionFormState extends State<TransactionForm> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        _transactionType = TransactionType.income;
+                        _transactionType = transaction.TransactionType.income;
                       });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          _transactionType == TransactionType.income
+                          _transactionType == transaction.TransactionType.income
                               ? Colors.green
                               : Colors.grey[500],
                     ),
@@ -124,14 +135,15 @@ class _TransactionFormState extends State<TransactionForm> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _transactionType = TransactionType.expense;
+                          _transactionType =
+                              transaction.TransactionType.expense;
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _transactionType == TransactionType.expense
-                                ? Colors.red
-                                : Colors.grey[500],
+                        backgroundColor: _transactionType ==
+                                transaction.TransactionType.expense
+                            ? Colors.red
+                            : Colors.grey[500],
                       ),
                       child: const Text(
                         "Saída",
@@ -169,7 +181,10 @@ class _TransactionFormState extends State<TransactionForm> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Button(
-                    onPressed: _handleSaveTransaction,
+                    onPressed: () {
+                      _handleSaveTransaction();
+                      Navigator.pop(context);
+                    },
                     text: "Salvar",
                     type: ButtonType.primary,
                   ),
