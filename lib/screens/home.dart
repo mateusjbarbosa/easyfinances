@@ -1,6 +1,6 @@
 import 'package:easyfinances/components/transaction_form.dart';
 import 'package:easyfinances/components/transaction_item.dart';
-import 'package:easyfinances/external/sqlite_database.dart';
+import 'package:easyfinances/external/sqflite_database.dart';
 import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleGetTransactions() async {
-    final data = await SQLDatabase.getAll("transactions");
+    final data = await SqfliteDatabase.getAll("transactions");
     final convertedTransactions = data.map((transaction) {
       return Transaction(
           description: transaction['description'] as String,

@@ -1,5 +1,5 @@
 import 'package:easyfinances/components/button.dart';
-import 'package:easyfinances/external/sqlite_database.dart';
+import 'package:easyfinances/external/sqflite_database.dart';
 import 'package:easyfinances/models/transaction.dart' as transaction;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -52,7 +52,7 @@ class _TransactionFormState extends State<TransactionForm> {
       date: _transactionDate,
     );
 
-    await SQLDatabase.insert("transactions", newTransaction.toMap());
+    await SqfliteDatabase.insert("transactions", newTransaction.toMap());
 
     widget.callback!();
   }
