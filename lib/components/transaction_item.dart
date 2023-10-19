@@ -52,7 +52,7 @@ class TransactionItem extends StatelessWidget {
     return ListTile(
       leading: getIcon(),
       title: Text(
-        transaction.title,
+        transaction.description,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
