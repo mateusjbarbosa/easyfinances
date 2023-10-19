@@ -1,20 +1,51 @@
 import 'package:easyfinances/components/transaction_form.dart';
 import 'package:easyfinances/components/transaction_item.dart';
+import 'package:easyfinances/external/sqlite_database.dart';
 import 'package:easyfinances/models/transaction.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  final List<Transaction> transactions = [];
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Transaction> transactions = [];
 
   Future<dynamic> handleAddNewTransaction(BuildContext context) {
     return showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return const TransactionForm();
-      },
+        return TransactionForm(
+          callback: _handleGetTransactions
+        );
+      },  
     );
+  }
+
+  void _handleGetTransactions() async {
+    final data = await SQLDatabase.getAll("transactions");
+    final convertedTransactions = data.map((transaction) {
+      return Transaction(
+          description: transaction['description'] as String,
+          type: TransactionType.values
+              .firstWhere((e) => e.toString() == transaction['type']),
+          value: transaction['value'] as double,
+          date: DateTime.tryParse(transaction['date'] as String) as DateTime,
+          id: transaction['id'] as int);
+    }).toList();
+
+    setState(() {
+      transactions = convertedTransactions;
+    });
+  }
+
+  @override
+  void initState() {
+    _handleGetTransactions();
+    super.initState();
   }
 
   @override
