@@ -1,5 +1,5 @@
+import 'package:easyfinances/utils/currency_formatter.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 class CurrencyInputFormatter extends TextInputFormatter {
   @override
@@ -7,19 +7,18 @@ class CurrencyInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (newValue.selection.baseOffset == 0) {
-      return newValue;
-    }
-
-    double value = double.parse(newValue.text);
-
-    final formatter = NumberFormat.simpleCurrency(locale: "pt_BR");
-
-    String newText = formatter.format(value / 100);
+    final formattedValue = CurrencyFormatter.addFormatting(
+      newValue.text,
+      isEditing: true,
+    );
 
     return newValue.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
+      text: formattedValue,
+      selection: TextSelection.collapsed(offset: formattedValue.length),
     );
+  }
+
+  static String removeFormatting(String formattedText) {
+    return formattedText.replaceFirst("R\$", "").replaceFirst(",", ".");
   }
 }

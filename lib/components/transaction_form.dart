@@ -1,6 +1,7 @@
 import 'package:easyfinances/components/button.dart';
 import 'package:easyfinances/external/sqflite_database.dart';
 import 'package:easyfinances/models/transaction.dart' as transaction;
+import 'package:easyfinances/utils/currency_formatter.dart';
 import 'package:easyfinances/utils/currency_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,10 +48,13 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   void _handleSaveTransaction() async {
+    String value = CurrencyFormatter.removeFormatting(
+      _valueController.value.text,
+    );
     final newTransaction = transaction.Transaction(
       description: _descriptionController.value.text,
       type: _transactionType,
-      value: double.parse(_valueController.value.text),
+      value: double.parse(value),
       date: _transactionDate,
     );
 
