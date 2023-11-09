@@ -1,7 +1,9 @@
 import 'package:easyfinances/components/button.dart';
 import 'package:easyfinances/external/sqflite_database.dart';
 import 'package:easyfinances/models/transaction.dart' as transaction;
+import 'package:easyfinances/utils/currency_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class TransactionForm extends StatefulWidget {
@@ -101,6 +103,11 @@ class _TransactionFormState extends State<TransactionForm> {
               ),
               TextField(
                 controller: _valueController,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  CurrencyInputFormatter()
+                ],
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: "Valor",
                 ),
