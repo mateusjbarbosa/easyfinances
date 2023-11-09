@@ -4,7 +4,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' show sqfliteFfiInit;
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class SqfliteDatabase {
-  static Future<Database> database() async {
+  static Future<Database> instance() async {
     databaseFactoryOrNull = null;
 
     sqfliteFfiInit();
@@ -21,7 +21,13 @@ class SqfliteDatabase {
       join(dbPath, "easyfinances.db"),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE transactions(id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type TEXT, value REAL, date TEXT)",
+          """CREATE TABLE transactions(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            description TEXT, 
+            type TEXT, 
+            value REAL, 
+            date TEXT
+          )""",
         );
       },
       version: 1,
@@ -29,13 +35,13 @@ class SqfliteDatabase {
   }
 
   static Future<void> insert(String table, Map<String, Object> data) async {
-    final db = await SqfliteDatabase.database();
+    final db = await SqfliteDatabase.instance();
 
     await db.insert(table, data, conflictAlgorithm: ConflictAlgorithm.rollback);
   }
 
   static Future<List<Map<String, Object?>>> getAll(String table) async {
-    final db = await SqfliteDatabase.database();
+    final db = await SqfliteDatabase.instance();
 
     return db.query(table);
   }
