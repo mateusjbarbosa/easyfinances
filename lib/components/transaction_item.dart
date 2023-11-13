@@ -1,4 +1,5 @@
 import 'package:easyfinances/models/transaction.dart';
+import 'package:easyfinances/utils/currency_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -30,7 +31,7 @@ class TransactionItem extends StatelessWidget {
     switch (transaction.type) {
       case TransactionType.expense:
         return Text(
-          "R\$ -${transaction.value.toString()}",
+          "- ${CurrencyFormatter.addFormatting(transaction.value.toString())}",
           style: const TextStyle(
             fontSize: 16,
             color: Colors.red,
@@ -38,7 +39,7 @@ class TransactionItem extends StatelessWidget {
         );
       case TransactionType.income:
         return Text(
-          "R\$ ${transaction.value.toString()}",
+          CurrencyFormatter.addFormatting(transaction.value.toString()),
           style: const TextStyle(
             fontSize: 16,
             color: Colors.green,
