@@ -9,9 +9,11 @@ import 'package:intl/intl.dart';
 
 class TransactionForm extends StatefulWidget {
   final Function? callback;
+  final transaction.Transaction? data;
 
   const TransactionForm({
     this.callback,
+    this.data,
     super.key,
   });
 
@@ -25,6 +27,20 @@ class _TransactionFormState extends State<TransactionForm> {
   transaction.TransactionType _transactionType =
       transaction.TransactionType.income;
   DateTime _transactionDate = DateTime.now();
+
+  void _handlePrepareForm() {
+    _descriptionController = TextEditingController();
+    _valueController = TextEditingController();
+
+    if (widget.data != null) {
+      _descriptionController.text = widget.data!.description;
+      _valueController.text = CurrencyFormatter.addFormatting(
+        widget.data!.value.toString(),
+      );
+      _transactionType = widget.data!.type;
+      _transactionDate = widget.data!.date;
+    }
+  }
 
   void _handleOpenCalendar() async {
     DateTime? selectedDate = await showDatePicker(
@@ -63,14 +79,33 @@ class _TransactionFormState extends State<TransactionForm> {
     widget.callback!();
   }
 
+  void _handleEditTransaction() async {
+    String value = CurrencyFormatter.removeFormatting(
+      _valueController.value.text,
+    );
+    final updatedTransaction = transaction.Transaction(
+      description: _descriptionController.value.text,
+      type: _transactionType,
+      value: double.parse(value),
+      date: _transactionDate,
+    );
+
+    await SqfliteDatabase.update(
+      widget.data!.id!,
+      "transactions",
+      updatedTransaction.toMap(),
+    );
+
+    widget.callback!();
+  }
+
   void _handleCancelTransaction() {
     Navigator.pop(context);
   }
 
   @override
   void initState() {
-    _descriptionController = TextEditingController();
-    _valueController = TextEditingController();
+    _handlePrepareForm();
     super.initState();
   }
 
@@ -193,7 +228,9 @@ class _TransactionFormState extends State<TransactionForm> {
                 children: [
                   Button(
                     onPressed: () {
-                      _handleSaveTransaction();
+                      widget.data?.id == null
+                          ? _handleSaveTransaction()
+                          : _handleEditTransaction();
                       Navigator.pop(context);
                     },
                     text: "Salvar",
