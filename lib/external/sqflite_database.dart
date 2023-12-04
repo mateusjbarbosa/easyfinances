@@ -40,6 +40,28 @@ class SqfliteDatabase {
     await db.insert(table, data, conflictAlgorithm: ConflictAlgorithm.rollback);
   }
 
+  static Future<void> update(
+    int id,
+    String table,
+    Map<String, Object> data,
+  ) async {
+    final db = await SqfliteDatabase.instance();
+
+    await db.update(
+      table,
+      data,
+      where: '$id = ?',
+      whereArgs: [id],
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  static Future<void> delete(int id, String table) async {
+    final db = await SqfliteDatabase.instance();
+
+    await db.delete(table, where: '$id = ?', whereArgs: [id]);
+  }
+
   static Future<List<Map<String, Object?>>> getAll(String table) async {
     final db = await SqfliteDatabase.instance();
 
