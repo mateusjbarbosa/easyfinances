@@ -20,11 +20,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final hideButtonController = ScrollController();
   bool isVisible = true;
 
-  Future<dynamic> handleAddNewTransaction(BuildContext context) {
+  Future<dynamic> handleOpenTransactionForm(
+    BuildContext context, [
+    Transaction? transaction,
+  ]) {
     return showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return TransactionForm(callback: _handleGetTransactions);
+        return TransactionForm(
+          callback: _handleGetTransactions,
+          data: transaction,
+        );
       },
     );
   }
@@ -47,24 +53,39 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         transactions = convertedTransactions;
       });
+    } else {
+      _updateBalance([]);
+      setState(() {
+        transactions = [];
+      });
     }
   }
 
-  void _updateBalance(List<Transaction> transactions) async {
-    final transactionsValue = transactions.map((transaction) {
-      if (transaction.type == TransactionType.expense) {
-        return transaction.value * -1;
-      } else {
-        return transaction.value;
-      }
-    }).toList();
-    final totalBalance = transactionsValue.reduce(
-      (currentBalance, transactionValue) => currentBalance + transactionValue,
-    );
+  Future<void> _handleDeleteTransaction(int id) async {
+    await SqfliteDatabase.delete(id, "transactions");
+  }
 
-    setState(() {
-      balance = totalBalance;
-    });
+  void _updateBalance(List<Transaction> transactions) async {
+    if (transactions.isNotEmpty) {
+      final transactionsValue = transactions.map((transaction) {
+        if (transaction.type == TransactionType.expense) {
+          return transaction.value * -1;
+        } else {
+          return transaction.value;
+        }
+      }).toList();
+      final totalBalance = transactionsValue.reduce(
+        (currentBalance, transactionValue) => currentBalance + transactionValue,
+      );
+
+      setState(() {
+        balance = totalBalance;
+      });
+    } else {
+      setState(() {
+        balance = 0;
+      });
+    }
   }
 
   void _addScrollListener() {
@@ -116,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.amber[900],
                 ),
                 color: Colors.white,
-                onPressed: () => handleAddNewTransaction(context),
+                onPressed: () => handleOpenTransactionForm(context),
                 icon: const Icon(Icons.add),
               ),
             ),
@@ -154,7 +175,12 @@ class _HomeScreenState extends State<HomeScreen> {
               scrollDirection: Axis.vertical,
               controller: hideButtonController,
               itemBuilder: (BuildContext context, int index) {
-                return TransactionItem(transactions[index]);
+                return TransactionItem(
+                  transactions[index],
+                  _handleGetTransactions,
+                  handleOpenTransactionForm,
+                  _handleDeleteTransaction,
+                );
               },
               itemCount: transactions.length,
             ),
@@ -167,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: Visibility(
         visible: isVisible,
         child: FloatingActionButton(
-          onPressed: () => handleAddNewTransaction(context),
+          onPressed: () => handleOpenTransactionForm(context),
           backgroundColor: Colors.amber[900],
           child: const Icon(
             Icons.add,
