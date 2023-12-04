@@ -5,8 +5,17 @@ import 'package:intl/intl.dart';
 
 class TransactionItem extends StatelessWidget {
   final Transaction transaction;
+  final Function onRefresh;
+  final Function onEdit;
+  final Function onDelete;
 
-  const TransactionItem(this.transaction, {super.key});
+  const TransactionItem(
+    this.transaction,
+    this.onRefresh,
+    this.onEdit,
+    this.onDelete, {
+    super.key,
+  });
 
   Widget getIcon() {
     switch (transaction.type) {
@@ -50,16 +59,51 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: getIcon(),
-      title: Text(
-        transaction.description,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
+    return Dismissible(
+      key: Key(transaction.id.toString()),
+      direction: DismissDirection.horizontal,
+      confirmDismiss: (direction) async {
+        // esquerda para direita
+        if (direction == DismissDirection.startToEnd) {
+          onEdit(context, transaction);
+          onRefresh();
+        } else {
+          onDelete(transaction.id);
+          onRefresh();
+        }
+        return null;
+      },
+      background: Container(
+        color: Colors.amber[900],
+        padding: const EdgeInsets.only(left: 18),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Icon(Icons.edit, color: Colors.white),
+          ],
         ),
       ),
-      subtitle: Text(getTransactionDate()),
-      trailing: getValueText(),
+      secondaryBackground: Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(right: 18),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(Icons.delete, color: Colors.white),
+          ],
+        ),
+      ),
+      child: ListTile(
+        leading: getIcon(),
+        title: Text(
+          transaction.description,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(getTransactionDate()),
+        trailing: getValueText(),
+      ),
     );
   }
 }
